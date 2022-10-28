@@ -1,5 +1,8 @@
 #!/bin/bash
 
+'
+Task2
+'
 #Update the repo list.
 sudo apt update -y
 
@@ -45,3 +48,32 @@ tar -cvzf /tmp/${myname}-httpd-logs-${timestamp}.tar /var/log/apache2/*.log
 aws s3 \
 cp /tmp/${myname}-httpd-logs-${timestamp}.tar \
 s3://${s3_bucket}/${myname}-httpd-logs-${timestamp}.tar
+
+
+
+
+
+'
+Task3
+'
+# Create file if does not exist.
+if [[ ! -e /var/www/html/inventory.html ]]; then
+	touch /var/www/html/inventory.html
+	echo "Log Type         Time Created         Type        Size" > /var/www/html/inventory.html
+fi
+
+echo "Inventory file is created"
+
+
+# Append Log details into inventory file.
+size=$(ls -lh /tmp/${myname}-httpd-logs-${timestamp}.tar | cut -d " " -f 5)
+echo "httpd-logs         $timestamp        tar        $size" >> /var/www/html/inventory.html
+echo "Log info is appended in inventory file"
+
+# Cronjob to run everyday midnight
+if [[ ! -e /etc/cron.d/automation ]]; then
+	touch /etc/cron.d/automation
+	echo "00 00 * * * root ./root/Automation_Project/automation.sh" > /etc/cron.d/automation
+fi
+
+echo "Cron job file and entry created"
